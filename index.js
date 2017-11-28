@@ -10,6 +10,9 @@ const regex_rm_conjuction = new RegExp("(\\s+)("+conjuction_list.join("|")+")(\\
 
 var similarity = require( 'compute-cosine-similarity' );
 
+const express = require('express')
+const app = express()
+
 var all_string = [];
 
 
@@ -50,12 +53,20 @@ all_string.forEach((as) => {
 var tf1 = []
 var tf2 = []
 var tf3 = []
+
+var term1 = []
 // TF 0
 tfidf.listTerms(0 /*document index*/).forEach(function(item) {
     console.log(item.term + ': ' + Math.round(item.tfidf))
     tf1.push(Math.round(item.tfidf))
+    term1.push(item.term + ': ' + Math.round(item.tfidf))
 });
 console.log('----------------------------------')
+
+app.get('/list_item', function (req, res) {
+	  res.send(term1)
+})
+
 
 // TF 2
 tfidf.listTerms(1 /*document index*/).forEach(function(item) {
@@ -143,3 +154,11 @@ for(var l=0; l< tf3.length; l++) {
 cos_sim2 = sum2 / (Math.sqrt(sum_tf2)*Math.sqrt(sum_tf3))
 
 console.log(cos_sim2)
+
+app.get('/', function (req, res) {
+  res.send('Cosine similarity TF1 and TF2 : ' + cos_sim)
+})
+
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!')
+})
