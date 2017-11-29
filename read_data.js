@@ -1,7 +1,6 @@
-var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
-var ObjectId = require('mongodb').ObjectID;
-var url = 'mongodb://localhost:27017/nlmtst';
+var Server = require("mongo-sync").Server;
+var server = new Server('127.0.0.1');
+var Fiber = require('fibers')
 
 'use strict'
 const fs 	=  require('fs')
@@ -15,16 +14,15 @@ const regex_rm_conjuction = new RegExp("(\\s+)("+conjuction_list.join("|")+")(\\
 const express = require('express')
 const app = express()
 
-var all_string = []
-
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  db.collection("medline").find({"MedlineCitation.Article.Abstract" : {$exists: true}}).forEach(function(result) {
+Fiber(function() {
+  // set up goes here ...
+  var all_string = []
+  var abs_all = []
+  server.db("nlmtst").getCollection("medline").find({"MedlineCitation.Article.Abstract" : {$exists: true}}).forEach(function(result) {
     var abstrak = result.MedlineCitation.Article.Abstract;
     var abstrak_fix = abstrak.AbstractText.map((data) => {
       return (typeof(data) == 'string') ? data : data.attrtext
     }).join("\n")
-    
     // stopwords, stemming and puctuation
     var removed_conjuction = abstrak_fix.replace(regex_rm_conjuction," ")
 	var text_array  = removed_conjuction.replace(/(\s)?\d\s+/g, ' ').replace(/\n+/g,' ').split(" ").filter((d) => {
@@ -40,13 +38,12 @@ MongoClient.connect(url, function(err, db) {
 		all_string.push(text_array[i])
 	}
 
-	// Term Frequency
+	abs_all.push(abstrak_fix)
+   })
+
+  	// Term Frequency
 	var TfIdf = natural.TfIdf;
 	var tfidf = new TfIdf();
-
-	var abs_all = abstrak_fix.split("\n")
-
-	// console.log(abs_all)
 
 	abs_all.forEach((dataa) => {
 		tfidf.addDocument(dataa)
@@ -59,6 +56,7 @@ MongoClient.connect(url, function(err, db) {
 
 	var tf1 = []
 	var tf2 = []
+	var tf3 = []
 
 	// TF 1
 	tfidf.listTerms(0).forEach(function(item) {
@@ -68,11 +66,16 @@ MongoClient.connect(url, function(err, db) {
 	tfidf.listTerms(1 /*document index*/).forEach(function(item) {
 	    tf2.push(Math.round(item.tfidf))
 	})
+	// TF 3
+	tfidf.listTerms(2 /*document index*/).forEach(function(item) {
+	    tf3.push(Math.round(item.tfidf))
+	});
 
 	// cosine similarity
 	console.log('Cosine similarity TF1 and TF2 ')
 	var l1 = tf1.length
 	var l2 = tf2.length
+	var l3 = tf3.length
 	if ( l1 > l2 ) {
 		var len_avg = l1-l2
 		for (var j=0; j<len_avg; j++) {
@@ -107,12 +110,40 @@ MongoClient.connect(url, function(err, db) {
 
 	console.log(cos_sim)
 
-	// end
+	console.log('Cosine similarity TF2 and TF3 ')
+	if ( l2 > l3 ) {
+		var len_avg3 = l2-l3
+		for (var j=0; j<len_avg; j++) {
+			tf3.push('0')
+		}
+	}
+	else{
+		var len_avg4 = l2-l1
+		for (var k=0; k<len_avg2; k++) {
+			tf2.push('0')
+		}
+	}
 
-	})
+	var sum2 = 0
+	for(var l=0; l< tf2.length; l++) {
+	    sum2 += tf1[l]*tf2[l]
+	}
 
-})
+	var cos_sim2 = 0
+	var sum_tf3 = 0
 
+	for(var l=0; l< tf2.length; l++) {
+	    sum_tf2 += tf2[l]*tf2[l]
+	}
+
+	for(var l=0; l< tf3.length; l++) {
+	    sum_tf3 += tf3[l]*tf3[l]
+	}
+
+	cos_sim2 = sum2 / (Math.sqrt(sum_tf2)*Math.sqrt(sum_tf3))
+
+	console.log(cos_sim2)
+}).run();
 
 
 

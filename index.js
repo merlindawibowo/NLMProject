@@ -67,7 +67,6 @@ app.get('/list_item', function (req, res) {
 	  res.send(term1)
 })
 
-
 // TF 2
 tfidf.listTerms(1 /*document index*/).forEach(function(item) {
     console.log(item.term + ': ' + Math.round(item.tfidf))
