@@ -44,16 +44,9 @@ MongoClient.connect(url, function(err, db) {
 				var rm_punctuaction = d.replace(regex_rm_punctuaction,'')
 				return reg.test(d) ?  d : stemmer.stem(rm_punctuaction)
 			})
-
-			// merge array
-			for (var i=0; i<text_array.length; i++) {
-				all_string.push(text_array[i])
-			}
-
+			all_string.push(...text_array)
 			abs_all.push(abstrak_fix)
 		})
-
-		//console.log(abs_all)
 
 	  	// Term Frequency
 		var TfIdf = natural.TfIdf;
@@ -65,18 +58,11 @@ MongoClient.connect(url, function(err, db) {
 
 		all_string.forEach((as) => {	
 			tfidf.tfidfs(as, function(i, measure) {
-				//console.log(measure)
 			})
 		})
 
-
 		var tf 	= new Array()
-		var tf1 = []
-		var tf2 = []
-		var tf3 = []
-
 		abs_all.forEach((data, index) => {
-			//console.log(index)
 			var array = []
 			tfidf.listTerms(index).forEach(function(item) {
 		    	array.push(Math.round(item.tfidf))
@@ -107,27 +93,17 @@ MongoClient.connect(url, function(err, db) {
 				var len_avg2 = l2-l1
 				for (var k=0; k<len_avg2; k++) { tf1.push(0) }
 			}
-			var sum = 0
-			for(var l=0; l< tf[item.first].length; l++) {
-			    sum += tf1[l]*tf2[l]
-			}
+			var sum = tf1.map((data,index) => {
+				return data * tf2[index]
+			}).reduce((accumulator, currentValue) => accumulator + currentValue)
+			var A = tf1.map((data, index) => {
+				return Math.pow(data, 2)
+			}).reduce((accumulator, currentValue) => accumulator + currentValue)
+			var B = tf2.map((data, index) => {
+				return Math.pow(data, 2)
+			}).reduce((accumulator, currentValue) => accumulator + currentValue)
 
-			//console.log(sum)
-
-			var cos_sim = 0
-			var sum_tf1 = 0
-			var sum_tf2 = 0
-
-			for(var l=0; l< tf1.length; l++) {
-			    sum_tf1 += tf1[l]*tf1[l]
-			}
-
-			for(var l=0; l< tf2.length; l++) {
-			    sum_tf2 += tf2[l]*tf2[l]
-			}
-
-			cos_sim = sum / (Math.sqrt(sum_tf1)*Math.sqrt(sum_tf2))
-
+			var cos_sim = sum / (Math.sqrt(A)*Math.sqrt(B))
 			console.log(cos_sim)
 		})
 		
