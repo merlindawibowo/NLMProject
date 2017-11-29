@@ -97,17 +97,19 @@ MongoClient.connect(url, function(err, db) {
 			console.log('Cosine similarity TF'+(item.first+1)+' and TF'+(item.second+1))
 			var l1 = tf[item.first].length
 			var l2 = tf[item.second].length
+			var tf1 = tf[item.first]
+			var tf2 = tf[item.second]
 			if ( l1 > l2 ) {
 				var len_avg = l1-l2
-				for (var j=0; j<len_avg; j++) { tf[item.second].push(0) }
+				for (var j=0; j<len_avg; j++) { tf2.push(0) }
 			}
 			else{
 				var len_avg2 = l2-l1
-				for (var k=0; k<len_avg2; k++) { tf[item.first].push(0) }
+				for (var k=0; k<len_avg2; k++) { tf1.push(0) }
 			}
 			var sum = 0
 			for(var l=0; l< tf[item.first].length; l++) {
-			    sum += tf[item.first][l]*tf[item.second][l]
+			    sum += tf1[l]*tf2[l]
 			}
 
 			//console.log(sum)
@@ -116,20 +118,22 @@ MongoClient.connect(url, function(err, db) {
 			var sum_tf1 = 0
 			var sum_tf2 = 0
 
-			for(var l=0; l< tf[item.first].length; l++) {
-			    sum_tf1 += tf[item.first][l]*tf[item.second][l]
+			for(var l=0; l< tf1.length; l++) {
+			    sum_tf1 += tf1[l]*tf1[l]
 			}
 
-			for(var l=0; l< tf[item.second].length; l++) {
-			    sum_tf2 += tf[item.first][l]*tf[item.second][l]
+			for(var l=0; l< tf2.length; l++) {
+			    sum_tf2 += tf2[l]*tf2[l]
 			}
 
 			cos_sim = sum / (Math.sqrt(sum_tf1)*Math.sqrt(sum_tf2))
 
 			console.log(cos_sim)
 		})
+		
 	})
 });
+
 
 
 	
