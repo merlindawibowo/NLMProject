@@ -1,9 +1,9 @@
-var Server = require("mongo-sync").Server;
-var server = new Server('127.0.0.1');
-var Fiber = require('fibers')
-
 'use strict'
-const fs 	=  require('fs')
+var MongoClient = require('mongodb').MongoClient
+  , assert = require('assert');
+var async = require('async')
+var url = 'mongodb://localhost:27017/nlmtst';
+const fs   =  require('fs')
 const natural = require('natural')
 var stem = require('stem-porter')
 const stemmer = natural.PorterStemmer
@@ -14,161 +14,116 @@ const regex_rm_conjuction = new RegExp("(\\s+)("+conjuction_list.join("|")+")(\\
 const express = require('express')
 const app = express()
 
-Fiber(function() {
-  // set up goes here ...
-  var all_string = []
-  var abs_all = []
+MongoClient.connect(url, function(err, db) {
+   async.series([
+    function(call) { 
+      var collection = db.collection('medline');
+      console.log('...loading...')
+      collection.find({"MedlineCitation.Article.Abstract" : {$exists: true}}).toArray(function(err, docs) {
+        if (err) throw err
+        //console.log(docs)
+        call(docs);
+     });
+     },
+  ], function(results){
+      db.close();
+      var all_string = []
+      var abs_all = []
+      results.forEach(function(result) {
+        var abstrak = result.MedlineCitation.Article.Abstract;
+        var abstrak_fix = abstrak.AbstractText.map((data) => {
+          return (typeof(data) == 'string') ? data : data.attrtext
+        }).join("\n")
+        // stopwords, stemming and puctuation
+        var removed_conjuction = abstrak_fix.replace(regex_rm_conjuction," ")
+      var text_array  = removed_conjuction.replace(/(\s)?\d\s+/g, ' ').replace(/\n+/g,' ').split(" ").filter((d) => {
+        return d != '' && conjuction_list.indexOf(d.toLowerCase()) < 1
+      }).map((d) => {
+        var reg = new RegExp(/\d/,'gi')
+        var rm_punctuaction = d.replace(regex_rm_punctuaction,'')
+        return reg.test(d) ?  d : stemmer.stem(rm_punctuaction)
+      })
 
-  // abstract
-  server.db("nlmtst").getCollection("medline").find({"MedlineCitation.Article.Abstract" : {$exists: true}}).forEach(function(result) {
-    var abstrak = result.MedlineCitation.Article.Abstract;
-    var abstrak_fix = abstrak.AbstractText.map((data) => {
-      return (typeof(data) == 'string') ? data : data.attrtext
-    }).join("\n")
-    // stopwords, stemming and puctuation
-    var removed_conjuction = abstrak_fix.replace(regex_rm_conjuction," ")
-	var text_array  = removed_conjuction.replace(/(\s)?\d\s+/g, ' ').replace(/\n+/g,' ').split(" ").filter((d) => {
-		return d != '' && conjuction_list.indexOf(d.toLowerCase()) < 1
-	}).map((d) => {
-		var reg = new RegExp(/\d/,'gi')
-		var rm_punctuaction = d.replace(regex_rm_punctuaction,'')
-		return reg.test(d) ?  d : stemmer.stem(rm_punctuaction)
-	})
+      // merge array
+      for (var i=0; i<text_array.length; i++) {
+        all_string.push(text_array[i])
+      }
 
-	// merge array
-	for (var i=0; i<text_array.length; i++) {
-		all_string.push(text_array[i])
-	}
+      abs_all.push(abstrak_fix)
+    })
 
-	abs_all.push(abstrak_fix)
-   })
+    // Term Frequency
+    var TfIdf = natural.TfIdf;
+    var tfidf = new TfIdf();
 
-  // function cosine
+    abs_all.forEach((dataa) => {
+      tfidf.addDocument(dataa)
+    })
 
-  
-
-  	// Term Frequency
-	var TfIdf = natural.TfIdf;
-	var tfidf = new TfIdf();
-
-	abs_all.forEach((dataa) => {
-		tfidf.addDocument(dataa)
-	})
-
-	all_string.forEach((as) => {	
-		tfidf.tfidfs(as, function(i, measure) {
-		})
-	})
-
-	var tf1 = []
-	var tf2 = []
-	var tf3 = []
-
-	var term1 = []
-	var term2 = []
-
-	// TF 1
-	tfidf.listTerms(0).forEach(function(item) {
-	    tf1.push(Math.round(item.tfidf))
-	    term1.push(item.term + ': ' + Math.round(item.tfidf))
-	})
-	// TF 2
-	tfidf.listTerms(1 /*document index*/).forEach(function(item) {
-	    tf2.push(Math.round(item.tfidf))
-	    term2.push(item.term + ': ' + Math.round(item.tfidf))
-	})
-	// TF 3
-	tfidf.listTerms(2 /*document index*/).forEach(function(item) {
-	    tf3.push(Math.round(item.tfidf))
-	});
-
-	// cosine similarity
-	var l1 = tf1.length
-	var l2 = tf2.length
-	var l3 = tf3.length
-	if ( l1 > l2 ) {
-		var len_avg = l1-l2
-		for (var j=0; j<len_avg; j++) {
-			tf2.push('0')
-		}
-	}
-	else{
-		var len_avg2 = l2-l1
-		for (var k=0; k<len_avg2; k++) {
-			tf1.push('0')
-		}
-	}
-
-	var sum = 0
-	for(var l=0; l< tf1.length; l++) {
-	    sum += tf1[l]*tf2[l]
-	}
-
-	var cos_sim = 0
-	var sum_tf1 = 0
-	var sum_tf2 = 0
-
-	for(var l=0; l< tf1.length; l++) {
-	    sum_tf1 += tf1[l]*tf1[l]
-	}
-
-	for(var l=0; l< tf2.length; l++) {
-	    sum_tf2 += tf2[l]*tf2[l]
-	}
-
-	cos_sim = sum / (Math.sqrt(sum_tf1)*Math.sqrt(sum_tf2))
-
-	if ( l2 > l3 ) {
-		var len_avg3 = l2-l3
-		for (var j=0; j<len_avg; j++) {
-			tf3.push('0')
-		}
-	}
-	else{
-		var len_avg4 = l2-l1
-		for (var k=0; k<len_avg2; k++) {
-			tf2.push('0')
-		}
-	}
-
-	var sum2 = 0
-	for(var l=0; l< tf2.length; l++) {
-	    sum2 += tf1[l]*tf2[l]
-	}
-
-	var cos_sim2 = 0
-	var sum_tf3 = 0
-
-	for(var l=0; l< tf2.length; l++) {
-	    sum_tf2 += tf2[l]*tf2[l]
-	}
-
-	for(var l=0; l< tf3.length; l++) {
-	    sum_tf3 += tf3[l]*tf3[l]
-	}
-
-	cos_sim2 = sum2 / (Math.sqrt(sum_tf2)*Math.sqrt(sum_tf3))
-
-	//parse to server
-	app.get('/', function (req, res) {
-	  res.send('Cosine similarity TF1 and TF2 : ' + cos_sim + 
-	  	"<br>" + 'Cosine similarity TF2 and TF3 : ' + cos_sim2)
-	})
-
-	app.get('/list_all_string', function (req, res){
-		res.json(all_string)
-	})
-
-	app.get('/list_tfidf', function (req, res){
-		res.json(term2)
-	})
-
-}).run();
+    all_string.forEach((as) => {  
+      tfidf.tfidfs(as, function(i, measure) {
+        //console.log(measure)
+      })
+    })
 
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
-})
+    var tf   = new Array()
+    var tf1 = []
+    var tf2 = []
+    var tf3 = []
 
+    abs_all.forEach((data, index) => {
+      //console.log(index)
+      var array = []
+      tfidf.listTerms(index).forEach(function(item) {
+          array.push(Math.round(item.tfidf))
+      })
+      tf.push(array)
+    })
+    //console.log(tf)
+    var tfprob = []
+    tf.forEach((tfitem1, index1) => {
+      tf.forEach((tfitem2, index2) => {
+        if (index1 != index2) {
+          tfprob.push({ first : index1 , second : index2})
+        }
+      })
+    })
 
-	
+    tfprob.forEach((item) => {
+      console.log('Cosine similarity TF'+(item.first+1)+' and TF'+(item.second+1))
+      var l1 = tf[item.first].length
+      var l2 = tf[item.second].length
+      if ( l1 > l2 ) {
+        var len_avg = l1-l2
+        for (var j=0; j<len_avg; j++) { tf[item.second].push(0) }
+      }
+      else{
+        var len_avg2 = l2-l1
+        for (var k=0; k<len_avg2; k++) { tf[item.first].push(0) }
+      }
+      var sum = 0
+      for(var l=0; l< tf[item.first].length; l++) {
+          sum += tf[item.first][l]*tf[item.second][l]
+      }
+
+      //console.log(sum)
+
+      var cos_sim = 0
+      var sum_tf1 = 0
+      var sum_tf2 = 0
+
+      for(var l=0; l< tf[item.first].length; l++) {
+          sum_tf1 += tf[item.first][l]*tf[item.second][l]
+      }
+
+      for(var l=0; l< tf[item.second].length; l++) {
+          sum_tf2 += tf[item.first][l]*tf[item.second][l]
+      }
+
+      cos_sim = sum / (Math.sqrt(sum_tf1)*Math.sqrt(sum_tf2))
+
+      console.log(cos_sim)
+    })
+  })
+});
