@@ -1,0 +1,38 @@
+{
+  "name": "nlmproject",
+  "version": "1.0.0",
+  "description": "Data Processing for NLM Data",
+  "main": "index.js",
+  "dependencies": {
+    "big-xml-streamer": "^0.0.5",
+    "big-xml": "^1.0.0",
+    "express": "^4.16.2",
+    "fibers": "^2.0.0",
+    "mongo-sync": "^2.0.1",
+    "mongoose": "^4.13.2",
+    "mongodb": "^2.2.33",
+    "mysql": "^2.15.0",
+    "natural": "^0.5.4",
+    "mysql2": "^1.4.2",
+    "pg": "^7.3.0",
+    "pg-hstore": "^2.3.2",
+    "compute-cosine-similarity": "^1.0.0",
+    "stem-porter": "^0.0.1",
+    "sequelize": "^4.18.0",
+    "xml-stream": "^0.4.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/merlindawibowo/NLMProject.git"
+  },
+  "author": "merlinda wibowo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/merlindawibowo/NLMProject/issues"
+  },
+  "homepage": "https://github.com/merlindawibowo/NLMProject#readme"
+}

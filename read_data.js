@@ -18,6 +18,8 @@ Fiber(function() {
   // set up goes here ...
   var all_string = []
   var abs_all = []
+
+  // abstract
   server.db("nlmtst").getCollection("medline").find({"MedlineCitation.Article.Abstract" : {$exists: true}}).forEach(function(result) {
     var abstrak = result.MedlineCitation.Article.Abstract;
     var abstrak_fix = abstrak.AbstractText.map((data) => {
@@ -41,6 +43,10 @@ Fiber(function() {
 	abs_all.push(abstrak_fix)
    })
 
+  // function cosine
+
+  
+
   	// Term Frequency
 	var TfIdf = natural.TfIdf;
 	var tfidf = new TfIdf();
@@ -58,13 +64,18 @@ Fiber(function() {
 	var tf2 = []
 	var tf3 = []
 
+	var term1 = []
+	var term2 = []
+
 	// TF 1
 	tfidf.listTerms(0).forEach(function(item) {
 	    tf1.push(Math.round(item.tfidf))
+	    term1.push(item.term + ': ' + Math.round(item.tfidf))
 	})
 	// TF 2
 	tfidf.listTerms(1 /*document index*/).forEach(function(item) {
 	    tf2.push(Math.round(item.tfidf))
+	    term2.push(item.term + ': ' + Math.round(item.tfidf))
 	})
 	// TF 3
 	tfidf.listTerms(2 /*document index*/).forEach(function(item) {
@@ -72,7 +83,6 @@ Fiber(function() {
 	});
 
 	// cosine similarity
-	console.log('Cosine similarity TF1 and TF2 ')
 	var l1 = tf1.length
 	var l2 = tf2.length
 	var l3 = tf3.length
@@ -108,9 +118,6 @@ Fiber(function() {
 
 	cos_sim = sum / (Math.sqrt(sum_tf1)*Math.sqrt(sum_tf2))
 
-	console.log(cos_sim)
-
-	console.log('Cosine similarity TF2 and TF3 ')
 	if ( l2 > l3 ) {
 		var len_avg3 = l2-l3
 		for (var j=0; j<len_avg; j++) {
@@ -142,11 +149,26 @@ Fiber(function() {
 
 	cos_sim2 = sum2 / (Math.sqrt(sum_tf2)*Math.sqrt(sum_tf3))
 
-	console.log(cos_sim2)
+	//parse to server
+	app.get('/', function (req, res) {
+	  res.send('Cosine similarity TF1 and TF2 : ' + cos_sim + 
+	  	"<br>" + 'Cosine similarity TF2 and TF3 : ' + cos_sim2)
+	})
+
+	app.get('/list_all_string', function (req, res){
+		res.json(all_string)
+	})
+
+	app.get('/list_tfidf', function (req, res){
+		res.json(term2)
+	})
+
 }).run();
 
 
-
+app.listen(3000, function () {
+  console.log('Example app listening on port 3000!')
+})
 
 
 	
