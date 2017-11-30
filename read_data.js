@@ -79,8 +79,10 @@ MongoClient.connect(url, function(err, db) {
 			})
 		})
 
+		var cos_sim_all = []
+
 		tfprob.forEach((item) => {
-			console.log('Cosine similarity TF'+(item.first+1)+' and TF'+(item.second+1))
+			// console.log('Cosine similarity TF'+(item.first+1)+' and TF'+(item.second+1))
 			var l1 = tf[item.first].length
 			var l2 = tf[item.second].length
 			var tf1 = tf[item.first]
@@ -104,8 +106,20 @@ MongoClient.connect(url, function(err, db) {
 			}).reduce((accumulator, currentValue) => accumulator + currentValue)
 
 			var cos_sim = sum / (Math.sqrt(A)*Math.sqrt(B))
-			console.log(cos_sim)
+			// console.log(cos_sim)
+
+			cos_sim_all.push('Cosine similarity TF'+(item.first+1)+' and TF'+(item.second+1)+' : ' +cos_sim)
 		})
+
+		//parse to server
+		app.get('/', function (req, res) {
+		  res.send(cos_sim_all)
+		})
+
+		app.listen(3000, function () {
+		  console.log('Example app listening on port 3000!')
+		})
+
 		
 	})
 });
