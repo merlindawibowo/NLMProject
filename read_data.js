@@ -14,6 +14,9 @@ const regex_rm_conjuction = new RegExp("(\\s+)("+conjuction_list.join("|")+")(\\
 const express = require('express')
 const app = express()
 
+// set the view engine to ejs
+app.set('view engine', 'ejs');
+
 MongoClient.connect(url, function(err, db) {
    async.series([
     function(call) { 
@@ -107,16 +110,18 @@ MongoClient.connect(url, function(err, db) {
 			var cos_sim = sum / (Math.sqrt(A)*Math.sqrt(B))
 			// console.log(cos_sim)
 
-			cos_sim_all.push('Cosine similarity TF'+(item.first+1)+' and TF'+(item.second+1)+' : ' +cos_sim)
+			cos_sim_all.push(cos_sim)
 		})
 
 		//parse to server
 		app.get('/', function (req, res) {
-		  res.send(cos_sim_all)
+		  res.render('pages/index', {
+		        cos_sim_all: cos_sim_all
+		    });
 		})
 
-		app.listen(3000, function () {
-		  console.log('Example app listening on port 3000!')
+		app.listen(8080, function () {
+		  console.log('Example app listening on port 8080!')
 		})
 
 		

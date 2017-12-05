@@ -28,14 +28,14 @@ MongoClient.connect(url, function(err, db) {
   ], function(results){
       db.close();
       var all_string = []
-      var mh_all = []
+      var abs_all = []
       results.forEach(function(result) {
-        var mh = result.MedlineCitation.MeshHeadingList;
-        var mh_fix = mh.MeshHeading.map((data) => {
+        var abstrak = result.MedlineCitation.MeshHeadingList;
+        var abstrak_fix = abstrak.MeshHeading.map((data) => {
           return (typeof(data) == 'string') ? data : data.DescriptorName.attrtext 
         }).join("\n")
         // stopwords, stemming and puctuation
-        var removed_conjuction = mh_fix.replace(regex_rm_conjuction," ")
+        var removed_conjuction = abstrak_fix.replace(regex_rm_conjuction," ")
       var text_array  = removed_conjuction.replace(/(\s)?\d\s+/g, ' ').replace(/\n+/g,' ').split(" ").filter((d) => {
         return d != '' && conjuction_list.indexOf(d.toLowerCase()) < 1
       }).map((d) => {
@@ -45,14 +45,14 @@ MongoClient.connect(url, function(err, db) {
       })
 
       all_string.push(...text_array)
-      mh_all.push(mh_fix)
+      abs_all.push(abstrak_fix)
     })
 
     // Term Frequency
     var TfIdf = natural.TfIdf;
     var tfidf = new TfIdf();
 
-    mh_all.forEach((dataa) => {
+    abs_all.forEach((dataa) => {
       tfidf.addDocument(dataa)
     })
 
@@ -62,7 +62,7 @@ MongoClient.connect(url, function(err, db) {
     })
 
     var tf  = new Array()
-    mh_all.forEach((data, index) => {
+    abs_all.forEach((data, index) => {
       var array = []
       tfidf.listTerms(index).forEach(function(item) {
           array.push(Math.round(item.tfidf))
