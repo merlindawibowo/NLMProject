@@ -17,6 +17,8 @@ const app = express()
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
+// modules 
+
 MongoClient.connect(url, function(err, db) {
    async.series([
     function(call) { 
@@ -128,26 +130,13 @@ MongoClient.connect(url, function(err, db) {
       sims[index] = r
     })
 
-    console.log(sims)
-    fs.writeFile("./test.json", JSON.stringify(sims), function(err) {
-        if(err) {
-            return console.log(err);
-        }
-        console.log("The file was saved!");
-    }); 
+    exports.sim_cos = function() {
+      return sims;
+    };
 
-    //mesh heading page
-    app.get('/mh', function (req, res) {
-      res.render('pages/read_mh', { 
-          sims : sims,
-            col_length : tf.length
-        });
-    })
-
-    app.listen(8080, function () {
-      console.log('Example app listening on port 8080!')
-    })
-
+    exports.col_length = function() {
+      return tf.length;
+    };
     
   })
 });
