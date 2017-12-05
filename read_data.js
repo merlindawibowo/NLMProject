@@ -14,6 +14,9 @@ const regex_rm_conjuction = new RegExp("(\\s+)("+conjuction_list.join("|")+")(\\
 const express = require('express')
 const app = express()
 
+// set the view engine to ejs
+app.set('view engine', 'ejs');
+
 MongoClient.connect(url, function(err, db) {
    async.series([
     function(call) { 
@@ -72,9 +75,9 @@ MongoClient.connect(url, function(err, db) {
 		var tfprob = []
 		tf.forEach((tfitem1, index1) => {
 			tf.forEach((tfitem2, index2) => {
-				if (index1 != index2) {
+				//if (index1 != index2) {
 					tfprob.push({ first : index1 , second : index2})
-				}
+				//}
 			})
 		})
 
@@ -105,18 +108,41 @@ MongoClient.connect(url, function(err, db) {
 			}).reduce((accumulator, currentValue) => accumulator + currentValue)
 
 			var cos_sim = sum / (Math.sqrt(A)*Math.sqrt(B))
-			// console.log(cos_sim)
-
-			cos_sim_all.push('Cosine similarity TF'+(item.first+1)+' and TF'+(item.second+1)+' : ' +cos_sim)
+			
+			cos_sim_all.push({
+				first : item.first,
+				second : item.second,
+				sim : cos_sim
+			})
+			
+		})
+		var sims = []
+		tf.forEach((tfitem1, index) => {
+			var r = cos_sim_all.filter((data) => {
+				return data.first == index
+			}).map((data) => {
+				return data.sim
+			})
+			sims[index] = r
 		})
 
+		console.log(sims)
+		fs.writeFile("./enak.json", JSON.stringify(sims), function(err) {
+		    if(err) {
+		        return console.log(err);
+		    }
+		    console.log("The file was saved!");
+		}); 
 		//parse to server
 		app.get('/', function (req, res) {
-		  res.send(cos_sim_all)
+		  res.render('pages/read_data', {	
+		  		sims : sims,
+		        col_length : tf.length
+		    });
 		})
 
-		app.listen(3000, function () {
-		  console.log('Example app listening on port 3000!')
+		app.listen(8080, function () {
+		  console.log('Example app listening on port 8080!')
 		})
 
 		

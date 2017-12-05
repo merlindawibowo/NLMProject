@@ -1,0 +1,43 @@
+<!-- views/pages/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+<header>
+    <% include ../partials/header %>
+</header>
+
+<main>
+    <div class="jumbotron">
+		<table border="1">
+		   <% for (var i = 0; i < col_length+1; i++) { %>
+		   		<tr>
+				   <% for (var j = 0; j < col_length+1; j++) { %>
+				   		<% if (i == 0 && j > 0) {%>
+				   			<td>Doc <%= j-1 %></td>
+				   		<%  } else if (j == 0 && i > 0){ %>
+				   			<td>Doc <%= i-1 %></td>
+				   		<% } else { %>
+				   			<td>
+				   				<% if ((i - 1) >= 0 && (j-1) >= 0 ) { %>
+				   				<%= sims[i-1][j-1] %>
+				   				<% } %>
+				   			</td>
+				   		<% } %>
+				   <% } %>
+			   </tr>
+		   <% } %>
+		</table>
+    </div>
+</main>
+
+<footer>
+    <% include ../partials/footer %>
+</footer>
+
+</body>
+</html>
