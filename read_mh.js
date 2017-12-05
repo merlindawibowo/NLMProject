@@ -14,6 +14,9 @@ const regex_rm_conjuction = new RegExp("(\\s+)("+conjuction_list.join("|")+")(\\
 const express = require('express')
 const app = express()
 
+// set the view engine to ejs
+app.set('view engine', 'ejs');
+
 MongoClient.connect(url, function(err, db) {
    async.series([
     function(call) { 
@@ -108,16 +111,41 @@ MongoClient.connect(url, function(err, db) {
       var cos_sim = sum / (Math.sqrt(A)*Math.sqrt(B))
       // console.log(cos_sim)
 
-      cos_sim_all.push('Cosine similarity TF'+(item.first+1)+' and TF'+(item.second+1)+' : ' +cos_sim)
+      cos_sim_all.push({
+        first : item.first,
+        second : item.second,
+        sim : cos_sim
+      })
     })
 
-    //parse to server
+    var sims = []
+    tf.forEach((tfitem1, index) => {
+      var r = cos_sim_all.filter((data) => {
+        return data.first == index
+      }).map((data) => {
+        return data.sim
+      })
+      sims[index] = r
+    })
+
+    console.log(sims)
+    fs.writeFile("./test.json", JSON.stringify(sims), function(err) {
+        if(err) {
+            return console.log(err);
+        }
+        console.log("The file was saved!");
+    }); 
+
+    //mesh heading page
     app.get('/mh', function (req, res) {
-      res.send(cos_sim_all)
+      res.render('pages/read_mh', { 
+          sims : sims,
+            col_length : tf.length
+        });
     })
 
-    app.listen(3000, function () {
-      console.log('Example app listening on port 3000!')
+    app.listen(8080, function () {
+      console.log('Example app listening on port 8080!')
     })
 
     

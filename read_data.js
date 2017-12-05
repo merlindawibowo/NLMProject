@@ -127,13 +127,14 @@ MongoClient.connect(url, function(err, db) {
 		})
 
 		console.log(sims)
-		fs.writeFile("./enak.json", JSON.stringify(sims), function(err) {
+		fs.writeFile("./test.json", JSON.stringify(sims), function(err) {
 		    if(err) {
 		        return console.log(err);
 		    }
 		    console.log("The file was saved!");
 		}); 
-		//parse to server
+		
+		// home page
 		app.get('/', function (req, res) {
 		  res.render('pages/read_data', {	
 		  		sims : sims,
