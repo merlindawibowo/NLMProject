@@ -125,7 +125,6 @@ MongoClient.connect(url, function(err, db) {
 			})
 			sims[index] = r
 		})
-
 		console.log(sims)
 		fs.writeFile("./enak.json", JSON.stringify(sims), function(err) {
 		    if(err) {
