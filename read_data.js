@@ -69,7 +69,8 @@ MongoClient.connect(url, function(err, db) {
 		abs_all.forEach((data, index) => {
 			var array = []
 			tfidf.listTerms(index).forEach(function(item) {
-		    	array.push(Math.round(item.tfidf))
+				//console.log(item)
+		    	array.push({ term : item.term , tfdif : Math.round(item.tfidf) })
 			})
 			tf.push(array)
 		})
@@ -93,20 +94,33 @@ MongoClient.connect(url, function(err, db) {
 			var tf2 = tf[item.second]
 			if ( l1 > l2 ) {
 				var len_avg = l1-l2
-				for (var j=0; j<len_avg; j++) { tf2.push(0) }
+				for (var j=0; j<len_avg; j++) { tf2.push({term : '-', tfdif : 0}) }
 			}
 			else{
 				var len_avg2 = l2-l1
-				for (var k=0; k<len_avg2; k++) { tf1.push(0) }
+				for (var k=0; k<len_avg2; k++) { tf1.push({term : '-', tfdif : 0}) }
 			}
-			var sum = tf1.map((data,index) => {
-				return data * tf2[index]
+			var tf_sum = []
+			tf1.forEach((item) => {
+				var a = tf2.filter((d) => {
+					return item.term == d.term && item.term != '-' && d.term != '-'
+				})
+				if (a.length > 0) {
+					var b = item.tfdif*a[0].tfdif
+					tf_sum.push(b)
+				}
+			})
+			//console.log(tf_sum)
+			/*var sum = tf1.map((data,index) => {
+				return   data.tfdif * tf2[index].tfdif
 			}).reduce((accumulator, currentValue) => accumulator + currentValue)
+			*/
+			var sum = tf_sum.length > 0 ? tf_sum.reduce((accumulator, currentValue) => accumulator + currentValue) : 0
 			var A = tf1.map((data, index) => {
-				return Math.pow(data, 2)
+				return Math.pow(data.tfdif, 2)
 			}).reduce((accumulator, currentValue) => accumulator + currentValue)
 			var B = tf2.map((data, index) => {
-				return Math.pow(data, 2)
+				return Math.pow(data.tfdif, 2)
 			}).reduce((accumulator, currentValue) => accumulator + currentValue)
 
 			var cos_sim = sum / (Math.sqrt(A)*Math.sqrt(B))
@@ -127,19 +141,7 @@ MongoClient.connect(url, function(err, db) {
 			})
 			sims[index] = r
 		})
-<<<<<<< HEAD
-		console.log(sims)
-		fs.writeFile("./enak.json", JSON.stringify(sims), function(err) {
-		    if(err) {
-		        return console.log(err);
-		    }
-		    console.log("The file was saved!");
-		}); 
-		//parse to server
-=======
-		
-		// home page
->>>>>>> 52ec0e49fa5d93291b038aa3035286d1164328c2
+
 		app.get('/', function (req, res) {
 		  res.render('pages/read_data', {	
 		  		sims : sims,
