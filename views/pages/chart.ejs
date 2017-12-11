@@ -2,6 +2,9 @@
 <html lang="en">
     <% include ../partials/head %>
 
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
 <body class="container">
 
 <header>
@@ -11,7 +14,9 @@
 <main>
     <div class="container">
     	<div class="row">
-		<embed src="https://plot.ly/~merlindawibowo/46.embed" height="500" />
+		<!-- <embed src="https://plot.ly/~merlindawibowo/46.embed" height="500" /> -->
+		<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
     </div>
 </div>
 </main>
@@ -20,6 +25,64 @@
     <% include ../partials/footer %>
 </footer>
 
+<script type="text/javascript">
+
+	Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Cosine Similarity NLM - MEDLINE/PubMed Data'
+    },
+    subtitle: {
+        text: 'Document 1 vs other Articles (Line 2)'
+    },
+    xAxis: {
+        categories: [
+            'Doc 1',
+            'Doc 2',
+            'Doc 3',
+            'Doc 4',
+            'Doc 5',
+            'Doc 6',
+            'Doc 7',
+            'Doc 8',
+            'Doc 9',
+            'Doc 10'
+        ],
+        crosshair: true
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Cosine Similarity'
+        }
+    },
+    tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0.2,
+            borderWidth: 0
+        }
+    },
+    series: [{
+        name: 'Abstract',
+        data: [0.042465134483885246,1,0.02153323295631573,0.0015204217851929904,0.02722826942511088,0,	0.0010457264392922832,0.00929681733630851,0.0032569700003734978,0,0]
+
+    }, {
+        name: 'Mesh Heading',
+        data: [0, 1, 0.1720370802687955, 0.14529928679884271,0,0.04842697347945388,0.060809872416754764,0.006684655884939572,0,0.02647746044039505,0]
+
+    }]
+});
+</script>
 <!-- /container -->
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -32,8 +95,7 @@
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 	<script src="https://code.jquery.com/jquery.js"></script>
 	<!-- Latest compiled and minified JavaScript -->
-	<script
-		src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 
 </body>
 </html>

@@ -32,6 +32,10 @@ app.get('/mh', function (req, res) {
 //chart page
 app.get('/chart', function (req, res) {
 	res.render('pages/chart', { 
+		sims_abs : abstrak.sim_cos(),
+		col_length_abs : abstrak.col_length(),
+		sims_mh : mh.sim_cos(),
+	    col_length_mh : mh.col_length()
 	});
 })
 
