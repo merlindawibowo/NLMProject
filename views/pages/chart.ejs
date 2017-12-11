@@ -11,25 +11,7 @@
 <main>
     <div class="container">
     	<div class="row">
-		<table border="1">
-		   <% for (var i = 0; i < col_length+1; i++) { %>
-		   		<tr>
-				   <% for (var j = 0; j < col_length+1; j++) { %>
-				   		<% if (i == 0 && j > 0) {%>
-				   			<td><b>Doc <%= j-1 %></b></td>
-				   		<%  } else if (j == 0 && i > 0){ %>
-				   			<td><b>Doc <%= i-1 %></b></td>
-				   		<% } else { %>
-				   			<td>
-				   				<% if ((i - 1) >= 0 && (j-1) >= 0 ) { %>
-				   				<%= sims[i-1][j-1] %>
-				   				<% } %>
-				   			</td>
-				   		<% } %>
-				   <% } %>
-			   </tr>
-		   <% } %>
-		</table>
+		<embed src="https://plot.ly/~merlindawibowo/46.embed" height="500" />
     </div>
 </div>
 </main>
@@ -52,5 +34,6 @@
 	<!-- Latest compiled and minified JavaScript -->
 	<script
 		src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
 </body>
 </html>

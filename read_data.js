@@ -17,7 +17,11 @@ const app = express()
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
-var mh = require('./read_mh.js')
+// var mh = require('./read_mh.js')
+
+//time execution
+var start = new Date();
+var hrstart = process.hrtime();
 
 MongoClient.connect(url, function(err, db) {
    async.series([
@@ -132,6 +136,7 @@ MongoClient.connect(url, function(err, db) {
 			})
 			
 		})
+
 		var sims = []
 		tf.forEach((tfitem1, index) => {
 			var r = cos_sim_all.filter((data) => {
@@ -142,24 +147,23 @@ MongoClient.connect(url, function(err, db) {
 			sims[index] = r
 		})
 
-		app.get('/', function (req, res) {
-		  res.render('pages/read_data', {	
-		  		sims : sims,
-		        col_length : tf.length
-		    });
-		})
+		exports.sim_cos = function() {
+	      return sims;
+	    };
 
-		//mesh heading page
-		app.get('/mh', function (req, res) {
-	      res.render('pages/read_mh', { 
-	          sims : mh.sim_cos(),
-	          col_length : mh.col_length()
-	        });
-	    })
+	    exports.col_length = function() {
+	      return tf.length;
+	    };
 
-		app.listen(8080, function () {
-		  console.log('Example app listening on port 8080!')
-		})
+	    //time execution
+		setTimeout(function (argument) {
+		    // execution time simulated with setTimeout function
+		    var end = new Date() - start,
+		        hrend = process.hrtime(hrstart);
+
+		    console.info("Execution time Abstract: %dms", end);
+		    console.info("Execution time Abstract (hr): %ds %dms", hrend[0], hrend[1]/1000000);
+		}, 1);
 
 		
 	})

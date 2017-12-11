@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
     <% include ../partials/head %>
-</head>
+
 <body class="container">
 
 <header>
@@ -10,15 +9,16 @@
 </header>
 
 <main>
-    <div class="jumbotron">
+    <div class="container">
+    	<div class="row">
 		<table border="1">
 		   <% for (var i = 0; i < col_length+1; i++) { %>
 		   		<tr>
 				   <% for (var j = 0; j < col_length+1; j++) { %>
 				   		<% if (i == 0 && j > 0) {%>
-				   			<td>Doc <%= j-1 %></td>
+				   			<td><b>Doc <%= j-1 %></b></td>
 				   		<%  } else if (j == 0 && i > 0){ %>
-				   			<td>Doc <%= i-1 %></td>
+				   			<td><b>Doc <%= i-1 %></b></td>
 				   		<% } else { %>
 				   			<td>
 				   				<% if ((i - 1) >= 0 && (j-1) >= 0 ) { %>
@@ -31,11 +31,27 @@
 		   <% } %>
 		</table>
     </div>
+</div>
 </main>
 
 <footer>
     <% include ../partials/footer %>
 </footer>
+
+<!-- /container -->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#about').addClass("active");
+		});
+	</script>
+	<!-- Bootstrap core JavaScript
+    ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://code.jquery.com/jquery.js"></script>
+	<!-- Latest compiled and minified JavaScript -->
+	<script
+		src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 
 </body>
 </html>

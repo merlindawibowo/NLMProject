@@ -17,6 +17,12 @@ const app = express()
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
+// var mh = require('./read_data.js')
+
+//time execution
+var start = new Date();
+var hrstart = process.hrtime();
+
 MongoClient.connect(url, function(err, db) {
    async.series([
     function(call) { 
@@ -147,6 +153,16 @@ MongoClient.connect(url, function(err, db) {
     exports.col_length = function() {
       return tf.length;
     };
+
+    setTimeout(function (argument) {
+        // execution time simulated with setTimeout function
+        var end = new Date() - start,
+            hrend = process.hrtime(hrstart);
+
+        console.info("Execution time Mesh Heading: %dms", end);
+        console.info("Execution time Mesh Heading(hr): %ds %dms", hrend[0], hrend[1]/1000000);
+    }, 1);
+
 
     
   })

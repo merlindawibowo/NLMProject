@@ -1,10 +1,7 @@
-<!-- views/pages/index.ejs -->
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
     <% include ../partials/head %>
-</head>
+
 <body class="container">
 
 <header>
@@ -13,24 +10,32 @@
 
 <main>
     <div class="jumbotron">
-		<table>
-		   <tr>
-		      <th>D</th><th>D</th>
-		   </tr>
-
-		   <% for (var i = 0; i < cos_sim_all.length; i++) { %>
-		    <tr>
-		      <td>D<%= i+1 %></td>
-		      <td><%= cos_sim_all[i] %></td>
-		    </tr>    
-		   <% } %>
-		</table>
+    	<div class="container">
+		HOME
+		<br><i>~ upload document coming soon ~</i>
+		<br>
     </div>
+</div>
 </main>
 
 <footer>
     <% include ../partials/footer %>
 </footer>
+
+<!-- /container -->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#about').addClass("active");
+		});
+	</script>
+	<!-- Bootstrap core JavaScript
+    ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://code.jquery.com/jquery.js"></script>
+	<!-- Latest compiled and minified JavaScript -->
+	<script
+		src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 
 </body>
 </html>
