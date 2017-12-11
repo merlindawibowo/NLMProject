@@ -6,7 +6,7 @@ var url = 'mongodb://localhost:27017/nlmtst';
 //Xml parser
 var fs = require('fs')
 var XmlStream = require('xml-stream');
-var stream = fs.createReadStream('medsample1.xml');
+var stream = fs.createReadStream('medline17n0002.xml');
 
 //Xml parser load data
 var xml = new XmlStream(stream);
@@ -24,7 +24,7 @@ json = json.replace(/\"\$/gi, "\"attr");
 MongoClient.connect(url, function(err, db) {
    if (err) throw err;
    var myobj = JSON.parse(json)
-   db.collection("medline").insertOne(myobj, function(err, res) {
+   db.collection("medline02").insertOne(myobj, function(err, res) {
      if (err) throw err;
      console.log("inserted successfully");
      db.close();

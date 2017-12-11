@@ -17,13 +17,11 @@ const app = express()
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
-// modules 
-
 MongoClient.connect(url, function(err, db) {
    async.series([
     function(call) { 
       var collection = db.collection('medline');
-      console.log('...loading...')
+      console.log('...loading mesh heading...')
       collection.find({"MedlineCitation.MeshHeadingList" : {$exists: true}}).toArray(function(err, docs) {
         if (err) throw err
         //console.log(docs)
@@ -37,7 +35,7 @@ MongoClient.connect(url, function(err, db) {
       results.forEach(function(result) {
         var mh = result.MedlineCitation.MeshHeadingList;
         var mh_fix = mh.MeshHeading.map((data) => {
-          return (typeof(data) == 'string') ? data : data.DescriptorName.attrtext 
+          return (typeof(data) == 'string') ? data : data.DescriptorName.attrtext
         }).join("\n")
         // stopwords, stemming and puctuation
         var removed_conjuction = mh_fix.replace(regex_rm_conjuction," ")
@@ -48,12 +46,11 @@ MongoClient.connect(url, function(err, db) {
         var rm_punctuaction = d.replace(regex_rm_punctuaction,'')
         return reg.test(d) ?  d : stemmer.stem(rm_punctuaction)
       })
-
       all_string.push(...text_array)
       mh_all.push(mh_fix)
     })
 
-    // Term Frequency
+      // Term Frequency
     var TfIdf = natural.TfIdf;
     var tfidf = new TfIdf();
 
@@ -70,7 +67,8 @@ MongoClient.connect(url, function(err, db) {
     mh_all.forEach((data, index) => {
       var array = []
       tfidf.listTerms(index).forEach(function(item) {
-          array.push(Math.round(item.tfidf))
+        //console.log(item)
+          array.push({ term : item.term , tfdif : Math.round(item.tfidf) })
       })
       tf.push(array)
     })
@@ -78,9 +76,9 @@ MongoClient.connect(url, function(err, db) {
     var tfprob = []
     tf.forEach((tfitem1, index1) => {
       tf.forEach((tfitem2, index2) => {
-        if (index1 != index2) {
+        //if (index1 != index2) {
           tfprob.push({ first : index1 , second : index2})
-        }
+        //}
       })
     })
 
@@ -94,32 +92,44 @@ MongoClient.connect(url, function(err, db) {
       var tf2 = tf[item.second]
       if ( l1 > l2 ) {
         var len_avg = l1-l2
-        for (var j=0; j<len_avg; j++) { tf2.push(0) }
+        for (var j=0; j<len_avg; j++) { tf2.push({term : '-', tfdif : 0}) }
       }
       else{
         var len_avg2 = l2-l1
-        for (var k=0; k<len_avg2; k++) { tf1.push(0) }
+        for (var k=0; k<len_avg2; k++) { tf1.push({term : '-', tfdif : 0}) }
       }
-      var sum = tf1.map((data,index) => {
-        return data * tf2[index]
+      var tf_sum = []
+      tf1.forEach((item) => {
+        var a = tf2.filter((d) => {
+          return item.term == d.term && item.term != '-' && d.term != '-'
+        })
+        if (a.length > 0) {
+          var b = item.tfdif*a[0].tfdif
+          tf_sum.push(b)
+        }
+      })
+      //console.log(tf_sum)
+      /*var sum = tf1.map((data,index) => {
+        return   data.tfdif * tf2[index].tfdif
       }).reduce((accumulator, currentValue) => accumulator + currentValue)
+      */
+      var sum = tf_sum.length > 0 ? tf_sum.reduce((accumulator, currentValue) => accumulator + currentValue) : 0
       var A = tf1.map((data, index) => {
-        return Math.pow(data, 2)
+        return Math.pow(data.tfdif, 2)
       }).reduce((accumulator, currentValue) => accumulator + currentValue)
       var B = tf2.map((data, index) => {
-        return Math.pow(data, 2)
+        return Math.pow(data.tfdif, 2)
       }).reduce((accumulator, currentValue) => accumulator + currentValue)
 
       var cos_sim = sum / (Math.sqrt(A)*Math.sqrt(B))
-      // console.log(cos_sim)
-
+      
       cos_sim_all.push({
         first : item.first,
         second : item.second,
         sim : cos_sim
       })
+      
     })
-
     var sims = []
     tf.forEach((tfitem1, index) => {
       var r = cos_sim_all.filter((data) => {
@@ -137,7 +147,7 @@ MongoClient.connect(url, function(err, db) {
     exports.col_length = function() {
       return tf.length;
     };
+
     
   })
 });
-

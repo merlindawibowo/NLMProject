@@ -23,7 +23,7 @@ MongoClient.connect(url, function(err, db) {
    async.series([
     function(call) { 
     	var collection = db.collection('medline');
-    	console.log('...loading...')
+    	console.log('...loading abstract...')
     	collection.find({"MedlineCitation.Article.Abstract" : {$exists: true}}).toArray(function(err, docs) {
 		    if (err) throw err
 		    //console.log(docs)
