@@ -17,6 +17,8 @@ const app = express()
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
+var mh = require('./read_mh.js')
+
 MongoClient.connect(url, function(err, db) {
    async.series([
     function(call) { 
@@ -125,6 +127,7 @@ MongoClient.connect(url, function(err, db) {
 			})
 			sims[index] = r
 		})
+<<<<<<< HEAD
 		console.log(sims)
 		fs.writeFile("./enak.json", JSON.stringify(sims), function(err) {
 		    if(err) {
@@ -133,12 +136,24 @@ MongoClient.connect(url, function(err, db) {
 		    console.log("The file was saved!");
 		}); 
 		//parse to server
+=======
+		
+		// home page
+>>>>>>> 52ec0e49fa5d93291b038aa3035286d1164328c2
 		app.get('/', function (req, res) {
 		  res.render('pages/read_data', {	
 		  		sims : sims,
 		        col_length : tf.length
 		    });
 		})
+
+		//mesh heading page
+		app.get('/mh', function (req, res) {
+	      res.render('pages/read_mh', { 
+	          sims : mh.sim_cos(),
+	          col_length : mh.col_length()
+	        });
+	    })
 
 		app.listen(8080, function () {
 		  console.log('Example app listening on port 8080!')
