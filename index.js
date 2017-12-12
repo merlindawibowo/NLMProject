@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
 
+var path = require('path')
+var multer = require('multer')
+
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
@@ -9,8 +12,35 @@ var mh = require('./read_mh.js')
 
 // home page
 app.get('/', function (req, res) {
-	res.render('pages/index', {	
+	res.render('pages/upload_doc', {	
 	});
+})
+
+// upload object
+var storage = multer.diskStorage({
+	destination: function(req, file, callback) {
+		callback(null, './uploads')
+	},
+	filename: function(req, file, callback) {
+		callback(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+	}
+})
+
+app.post('/uploads', function(req, res) {
+	var upload = multer({
+		storage: storage,
+		fileFilter: function(req, file, callback) {
+			var ext = path.extname(file.originalname)
+			if (ext !== '.xml' ) {
+				return callback(res.end('Only xml are allowed'), null)
+			}
+			callback(null, true)
+		}
+	}).single('userFile');
+	upload(req, res, function(err) {
+		res.render('pages/upload_doc')
+
+	})
 })
 
 //abstract page

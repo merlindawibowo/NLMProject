@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <% include ../partials/head %>
+
+<body class="container">
+
+<header>
+    <% include ../partials/header %>
+</header>
+
+<main>
+    <div class="jumbotron">
+    	<div class="container">
+		LIST XML FILE
+		<br>
+		<h5>
+		<form id="uploadForm" enctype="multipart/form-data" method="post">
+			<input type="file" name="userFile" /><br>
+			<input class="btn btn-sm btn-primary" type="submit" value="Upload File" name="submit">
+		</form></h5>
+		<br>
+		
+    </div>
+</div>
+</main>
+
+<footer>
+    <% include ../partials/footer %>
+</footer>
+
+<!-- /container -->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('#about').addClass("active");
+		});
+	</script>
+	<!-- Bootstrap core JavaScript
+    ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="https://code.jquery.com/jquery.js"></script>
+	<!-- Latest compiled and minified JavaScript -->
+	<script
+		src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+</body>
+</html>
