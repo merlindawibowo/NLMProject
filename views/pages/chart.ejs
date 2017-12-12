@@ -14,7 +14,9 @@
 <main>
     <div class="container">
     	<div class="row">
-		<!-- <embed src="https://plot.ly/~merlindawibowo/46.embed" height="500" /> -->
+
+			<p id="demo"></p>
+
 		<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 
     </div>
@@ -26,6 +28,23 @@
 </footer>
 
 <script type="text/javascript">
+	var abs = [];
+	var doc_length = <%= col_length_abs%>;
+	<% for (var i = 1; i < col_length_abs+1; i++) { 
+				%> abs.push(<%= sims_abs[1][i-1] %>);<%
+			} %>
+
+	var mh = [];
+	<% for (var i = 1; i < col_length_abs+1; i++) { 
+				%> mh.push(<%= sims_mh[1][i-1] %>);<%
+			} %>
+
+	var no_doc = [];
+
+	for (var i = 0; i < doc_length; i++) {
+		no_doc.push("Doc "+i);
+	}
+	
 
 	Highcharts.chart('container', {
     chart: {
@@ -38,18 +57,7 @@
         text: 'Document 1 vs other Articles (Line 2)'
     },
     xAxis: {
-        categories: [
-            'Doc 1',
-            'Doc 2',
-            'Doc 3',
-            'Doc 4',
-            'Doc 5',
-            'Doc 6',
-            'Doc 7',
-            'Doc 8',
-            'Doc 9',
-            'Doc 10'
-        ],
+        categories: no_doc,
         crosshair: true
     },
     yAxis: {
@@ -74,11 +82,11 @@
     },
     series: [{
         name: 'Abstract',
-        data: [0.042465134483885246,1,0.02153323295631573,0.0015204217851929904,0.02722826942511088,0,	0.0010457264392922832,0.00929681733630851,0.0032569700003734978,0,0]
+        data: abs
 
     }, {
         name: 'Mesh Heading',
-        data: [0, 1, 0.1720370802687955, 0.14529928679884271,0,0.04842697347945388,0.060809872416754764,0.006684655884939572,0,0.02647746044039505,0]
+        data: mh
 
     }]
 });

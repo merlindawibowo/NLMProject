@@ -17,8 +17,6 @@ const app = express()
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
-// var mh = require('./read_mh.js')
-
 //time execution
 var start = new Date();
 var hrstart = process.hrtime();

@@ -30,7 +30,7 @@ MongoClient.connect(url, function(err, db) {
       console.log('...loading mesh heading...')
       collection.find({"MedlineCitation.MeshHeadingList" : {$exists: true}}).toArray(function(err, docs) {
         if (err) throw err
-        //console.log(docs)
+        // console.log(docs.length)
         call(docs);
      });
      },
