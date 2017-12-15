@@ -16,7 +16,7 @@ app.get('/', function (req, res) {
 	});
 })
 
-// upload object
+// upload file
 var storage = multer.diskStorage({
 	destination: function(req, file, callback) {
 		callback(null, './uploads')
@@ -26,7 +26,7 @@ var storage = multer.diskStorage({
 	}
 })
 
-app.post('/uploads', function(req, res) {
+app.post('/', function(req, res) {
 	var upload = multer({
 		storage: storage,
 		fileFilter: function(req, file, callback) {

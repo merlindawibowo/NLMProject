@@ -31,13 +31,13 @@
 	var abs = [];
 	var doc_length = <%= col_length_abs%>;
 	<% for (var i = 1; i < col_length_abs+1; i++) { 
-				%> abs.push(<%= sims_abs[1][i-1] %>);<%
-			} %>
+				%> abs.push(<%= sims_abs[i-1] %>);<%
+            } %>
 
 	var mh = [];
 	<% for (var i = 1; i < col_length_abs+1; i++) { 
-				%> mh.push(<%= sims_mh[1][i-1] %>);<%
-			} %>
+				%> mh.push(<%= sims_mh[i-1] %>);<%
+            } %>
 
 	var no_doc = [];
 
@@ -54,7 +54,7 @@
         text: 'Cosine Similarity NLM - MEDLINE/PubMed Data'
     },
     subtitle: {
-        text: 'Document 1 vs other Articles (Line 2)'
+        text: 'Document 2 vs other Documents'
     },
     xAxis: {
         categories: no_doc,
@@ -62,7 +62,7 @@
     },
     yAxis: {
         min: 0,
-        max: 1,
+        max: 0.3,
         title: {
             text: 'Cosine Similarity'
         }

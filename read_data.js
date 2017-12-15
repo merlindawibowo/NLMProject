@@ -76,15 +76,17 @@ MongoClient.connect(url, function(err, db) {
 			})
 			tf.push(array)
 		})
-		//console.log(tf)
+		
 		var tfprob = []
 		tf.forEach((tfitem1, index1) => {
+			if (index1 == 2) {
 			tf.forEach((tfitem2, index2) => {
-				//if (index1 != index2) {
 					tfprob.push({ first : index1 , second : index2})
-				//}
 			})
+			}
 		})
+
+		// console.log(tfprob)
 
 		var cos_sim_all = []
 
