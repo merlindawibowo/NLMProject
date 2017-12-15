@@ -24,7 +24,7 @@ var hrstart = process.hrtime();
 MongoClient.connect(url, function(err, db) {
    async.series([
     function(call) { 
-    	var collection = db.collection('medline');
+    	var collection = db.collection('medline1');
     	console.log('...loading abstract...')
     	collection.find({"MedlineCitation.Article.Abstract" : {$exists: true}}).toArray(function(err, docs) {
 		    if (err) throw err
@@ -140,7 +140,7 @@ MongoClient.connect(url, function(err, db) {
 		var sims = []
 		tf.forEach((tfitem1, index) => {
 			var r = cos_sim_all.filter((data) => {
-				return data.first == index
+				return data.second == index
 			}).map((data) => {
 				return data.sim
 			})
