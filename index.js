@@ -7,14 +7,39 @@ var multer = require('multer')
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
-var abstrak = require('./read_data.js')
 var mh = require('./read_mh.js')
+var abstrak = require('./read_data.js')
+
+const fs = require('fs');
+var xmlDir = './uploads/';
+var xmlLists = [];
 
 // home page
 app.get('/', function (req, res) {
-	res.render('pages/upload_doc', {	
-	});
+	//call function get list file
+	getFile(xmlDir, function (err, files) {
+            for (var i=0; i<files.length; i++) {
+                xmlLists.push(files[i]);
+            }
+            res.render('pages/upload_doc', {
+            	xmlLists: xmlLists	
+			});
+        });	
 })
+
+//get the list of files
+function getFile(xmlDir, callback) {
+    var fileType = '.xml',
+        files = [], i;
+    fs.readdir(xmlDir, function (err, list) {
+        for(i=0; i<list.length; i++) {
+            if(path.extname(list[i]) === fileType) {
+                files.push(list[i]); //store the file name into the array files
+            }
+        }
+        callback(err, files);
+    });
+}
 
 // upload file
 var storage = multer.diskStorage({
@@ -38,7 +63,9 @@ app.post('/', function(req, res) {
 		}
 	}).single('userFile');
 	upload(req, res, function(err) {
-		res.render('pages/upload_doc')
+		res.render('pages/upload_doc', {
+			xmlLists: xmlLists
+		})
 
 	})
 })

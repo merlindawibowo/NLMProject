@@ -19,6 +19,18 @@
 			<input class="btn btn-sm btn-primary" type="submit" value="Upload File" name="submit">
 		</form>
 		<br>
+		<table border="1">
+			<tr>
+				<td><b>File</b></td>
+			</tr>
+		   <% for (var i = 1; i < 3; i++) { %>
+		   		<tr>
+				   	<td>
+				   		<%= xmlLists[i-1] %>
+				   	</td>
+			   </tr>
+		   <% } %>
+		</table>
 		</h5>
 		
 		

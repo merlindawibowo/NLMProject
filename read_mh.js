@@ -148,7 +148,7 @@ MongoClient.connect(url, function(err, db) {
       sims[index] = r
     })
 
-    console.log(sims)
+    // console.log(sims)
 
     exports.sim_cos = function() {
       return sims;
