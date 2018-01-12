@@ -30,6 +30,7 @@
 <script type="text/javascript">
 	var abs = [];
 	var doc_length = <%= col_length_abs%>;
+    var doc_length2 = <%= col_length_mh - col_length_abs%>;
 	<% for (var i = 1; i < col_length_abs+1; i++) { 
 				%> abs.push(<%= sims_abs[i-1] %>);<%
             } %>

@@ -11,9 +11,9 @@
 <main>
     <div class="jumbotron">
     	<h5>
-    	<a href="/mh"><BUTTON class="btn btn-sm btn-primary">FILE 1</BUTTON></a>
-    	<a href="/mh2"><BUTTON class="btn btn-sm btn-primary">FILE 2</BUTTON></a>
-    	<a href="/mh3"><BUTTON class="btn btn-sm btn-primary">FILE 3</BUTTON></a>
+    	<a href="/abs"><BUTTON class="btn btn-sm btn-primary">FILE 1</BUTTON></a>
+    	<a href="/abs2"><BUTTON class="btn btn-sm btn-primary">FILE 2</BUTTON></a>
+    	<a href="/abs3"><BUTTON class="btn btn-sm btn-primary">FILE 3</BUTTON></a>
     	<br>
     	<br>
 		<table border="1">
@@ -21,7 +21,7 @@
 				<td><b>Docs</b></td>
 				<td><b>Doc 2</b></td>
 			</tr>
-		   <% for (var i = 1; i < 110; i++) { %>
+		   <% for (var i = 1; i < col_length+1; i++) { %>
 		   		<tr>
 				   			<td><b>Doc <%= i-1 %></b></td>
 				   			<td>
@@ -52,6 +52,5 @@
 	<!-- Latest compiled and minified JavaScript -->
 	<script
 		src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-
 </body>
 </html>

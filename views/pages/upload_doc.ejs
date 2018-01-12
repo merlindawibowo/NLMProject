@@ -11,7 +11,7 @@
 <main>
     <div class="jumbotron">
     	<div class="container">
-		LIST XML FILE
+		UPLOAD XML FILE
 		<br>
 		<h5>
 		<form id="uploadForm" enctype="multipart/form-data" method="post">
@@ -23,13 +23,13 @@
 			<tr>
 				<td><b>File</b></td>
 			</tr>
-		   <% for (var i = 1; i < 3; i++) { %>
+		   <% xmlLists.forEach(function(data){ %>
 		   		<tr>
 				   	<td>
-				   		<%= xmlLists[i-1] %>
+				   		<%= data %>
 				   	</td>
 			   </tr>
-		   <% } %>
+		   <% }) %>
 		</table>
 		</h5>
 		
